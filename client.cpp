@@ -5,15 +5,14 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
+#include <cstdio>
 
 #include "client.h"
 #include "wrap.h"
 
 using namespace C_std;
 using namespace C_std::Network;
-using std::string;
-using std::cin;
-using std::cout;
+using namespace std;
 
 void client_func(int sockfd) {
     //从标准输入读入一行数据，发送给服务端，输出处理后的数据
@@ -21,8 +20,10 @@ void client_func(int sockfd) {
     char buf[BUFSIZ];
     int n;
     while (getline(cin, line)) {
+//        cout << "test:" << line.c_str() << line.size() <<  "\n";
         Write(sockfd, line.c_str(), line.size());
         int n = Read(sockfd, buf, BUFSIZ);
+        buf[n]= '\0';
         cout << buf << "\n";
     }
 }

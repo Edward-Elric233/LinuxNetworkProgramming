@@ -40,6 +40,10 @@ namespace C_std {
         return n;
     }
 
+    int Open(const char *pathname, int flags, mode_t mode) {
+        return check_error(open(pathname, flags, mode), "open error");
+    }
+
     int Close(int fd) {
         return check_error(close(fd));
     }

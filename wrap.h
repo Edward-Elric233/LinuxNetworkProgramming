@@ -36,6 +36,15 @@ namespace C_std {
     ssize_t Write(int fd, const void *buf, size_t count);
 
     /*!
+     * open函数
+     * @param pathname
+     * @param flags
+     * @param mode
+     * @return
+     */
+    int Open(const char *pathname, int flags, mode_t mode);
+
+    /*!
      * close函数
      * @param fd        需要关闭的文件描述符
      * @return          成功0，失败-1

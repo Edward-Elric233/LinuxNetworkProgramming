@@ -15,7 +15,7 @@ using std::ofstream;
 using namespace C_std;
 using namespace C_std::Network;
 
-void start_server() {
+void start_server(int port, const string &ip, const string &log_file) {
     //创建守护进程
     pid_t pid = fork();
     if (pid > 0) exit(1);
@@ -29,10 +29,11 @@ void start_server() {
     Close(STDIN_FILENO);
     open("/dev/null", O_RDWR);
     dup2(STDIN_FILENO, STDOUT_FILENO);
-    dup2(STDIN_FILENO, STDERR_FILENO);
+    int fd = Open("./err.log", O_CREAT | O_RDWR | O_APPEND, 0644);
+    dup2(fd, STDERR_FILENO);
 
-    //multi_process_server("../server.log");
-    multi_thread_server("../server.log");
+    //multi_process_server(port, ip, log_file);
+    multi_thread_server(port, ip, log_file);
 }
 
 std::string algorithm(const std::string &input) {
@@ -50,7 +51,14 @@ void server_func(const C_std::Network::client_socket &client) {
     int n;
     while ((n = Read(client_sockfd, buf, BUFSIZ)) > 0) {
         //客户端没有关闭，服务端阻塞等待客户端输入
+//        int fd = Open("./test.log", O_CREAT | O_RDWR | O_APPEND, 0644);
+//        Write(fd, "read:", 5);
+//        Write(fd, buf, n);
+        buf[n] = '\0';
         string ret = algorithm(buf);
+//        Write(fd, "write:", 6);
+//        Write(fd, ret.c_str(), ret.size());
+//        close(fd);
         Write(client_sockfd, ret.c_str(), ret.size());
     }
     //关闭客户端socket写端
@@ -76,11 +84,11 @@ void catch_signal() {
     signal(SIGCHLD, wait_child);
 }
 
-void multi_process_server(const string &log_file) {
+void multi_process_server(int port, const std::string &ip, const std::string &log_file) {
     int client_num = 0;
     Log log(log_file);
     int listened_sockfd = Socket(AF_INET, SOCK_STREAM, 0);
-    easy_bind(listened_sockfd, 8888, "127.0.0.1");
+    easy_bind(listened_sockfd, port, ip);
     Listen(listened_sockfd, 128);
 
     catch_signal();
@@ -126,12 +134,12 @@ void *start_routine(void *_arg) {
     delete arg;
 }
 
-void multi_thread_server(const std::string &log_file) {
+void multi_thread_server(int port, const std::string &ip, const std::string &log_file) {
     using namespace POSIX::multithreading;
     int client_num = 0;
 
     int listened_sockfd = Socket(AF_INET, SOCK_STREAM, 0);
-    easy_bind(listened_sockfd, 9999, "127.0.0.1");
+    easy_bind(listened_sockfd, port, ip);
     Listen(listened_sockfd, 128);
     while (1) {
         ++client_num;

@@ -9,8 +9,11 @@
 
 /*!
  * 创建守护进程，并开始处理客户端请求
+ * @param port
+ * @param ip            默认值为127.0.0.1
+ * @param log_file      默认值为./server.log
  */
-void start_server();
+void start_server(int port, const std::string &ip = "127.0.0.1", const std::string &log_file = "./server.log");
 
 /*!
  * 服务端与客户端交互
@@ -21,13 +24,13 @@ void server_func(const C_std::Network::client_socket &client);
 /*!
  * 通过多进程处理客户端请求
  */
-void multi_process_server(const std::string &log_file);
+void multi_process_server(int port, const std::string &ip = "127.0.0.1", const std::string &log_file = "./server.log");
 
 /*!
  * 通过多线程处理客户端请求
  * @param log_file
  */
-void multi_thread_server(const std::string &log_file);
+void multi_thread_server(int port, const std::string &ip = "127.0.0.1", const std::string &log_file = "./server.log");
 
 /*!
  * 算法处理

@@ -48,6 +48,59 @@ namespace C_std {
         return check_error(close(fd));
     }
 
+
+    int read_n(int fd, void *buf, size_t count) {
+        int n_left = count;                         //必须是int类型，因为后面会检查n_left <= 0，如果是size_t则只能检查==0
+        int n_read = 0;
+        char *p = reinterpret_cast<char *>(buf);    //如果不转换成char *类型则无法进行算数运算
+        while (n_left > 0) {
+            n_read = Read(fd, p, n_left);
+            if (n_read == 0) {
+                //非常重要，有可能对端关闭，退出read
+                break;
+            }
+            n_left -= n_read;
+            p += n_read;
+        }
+        return count - n_left;
+    }
+
+    int my_read(int fd, char *c) {
+        constexpr int BUFFSIZ = 100;
+        static char buf[BUFFSIZ];
+        static int buf_size = 0;
+        static int idx = 0;
+        if (buf_size <= 0) {
+            buf_size = Read(fd, buf, BUFFSIZ);
+            idx = 0;
+            if (buf_size == 0) {
+                //读入失败
+                return 0;
+            }
+        }
+        *c = buf[idx];          //拷贝值，不能让指针指向该静态区域
+        ++idx;
+        --buf_size;
+        return 1;
+    }
+
+    int read_line(int fd, void *buf, size_t count) {
+        char c;
+        int n_read = 0;
+        int ret = 0;
+        char *p = reinterpret_cast<char *>(buf);
+//        --count;                //因为最后需要添加一个字符串结束符，socket中没有，但是原本就没有，为了统一没有就没有吧
+        while (n_read < count) {
+            ret = my_read(fd, &c);
+            if (ret == 0 || c == '\n') {
+                break;
+            }
+            p[n_read] = c;
+            ++n_read;
+        }
+        return n_read;
+    }
+
     namespace IPC {
         void *Mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
             void *p = mmap(addr, length, prot, flags, fd, offset);

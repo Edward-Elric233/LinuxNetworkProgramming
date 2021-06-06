@@ -80,6 +80,11 @@ void wait_child(int signo) {
 
 }
 
+/*!
+ * 注册信号捕捉函数，这里使用signal进行捕捉，也可以使用sigaction，这个稍微精细一些
+ * signal默认打断系统调用后会重启系统调用
+ * 但是sigaction默认不会，如果有这个要求需要将sigaction结构体中的sa_flags设置为SA_RESTART
+ */
 void catch_signal() {
     signal(SIGCHLD, wait_child);
 }

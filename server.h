@@ -28,7 +28,6 @@ void multi_process_server(int port, const std::string &ip = "127.0.0.1", const s
 
 /*!
  * 通过多线程处理客户端请求
- * @param log_file
  */
 void multi_thread_server(int port, const std::string &ip = "127.0.0.1", const std::string &log_file = "./server.log");
 

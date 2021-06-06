@@ -161,6 +161,33 @@ namespace C_std {
          */
         int easy_connect(int sockfd, int port, const std::string ip);
 
+        /*!
+         * 从socket中读count个字符
+         * @param fd            socket文件描述符
+         * @param buf           传出参数
+         * @param count         读入字符个数，应该小于等于buf的长度，函数不会进行检查
+         * @return              读入字符的个数
+         */
+        int read_n(int fd, void *buf, size_t count);
+
+        /*!
+         * 从socket中读1个字符，为了加速每次读一个块保存在局部静态变量中
+         * @param fd            socket文件描述符
+         * @param c             传出参数：读出的字符
+         * @return              读入字符个数：0/1
+         */
+        int my_read(int fd, char *c);
+
+        /*!
+         * 从socket中读入一行数据，如果使用该函数必须一直使用，不能再自己使用read函数读取，原因在于有可能部分数据保存在my_read的静态buf中
+         * 同getline函数一样，这个函数不会读入换行符
+         * @param fd            socket文件描述符
+         * @param buf           传出参数
+         * @param count         buf的长度
+         * @return              读入字符的个数
+         */
+        int read_line(int fd, void *buf, size_t count);
+
     }
 }
 

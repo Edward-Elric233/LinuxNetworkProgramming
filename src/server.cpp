@@ -3,6 +3,7 @@
 //
 
 #include "server.h"
+#include "Work.h"
 #include <cctype>
 #include <fstream>
 #include <semaphore.h>
@@ -37,12 +38,7 @@ void start_server(int port, const string &ip, const string &log_file) {
 }
 
 std::string algorithm(const std::string &input) {
-    string ret = input;
-    //将小写字符转换为大写
-    for (auto &c : ret) {
-        c = std::toupper(c);
-    }
-    return std::move(ret);
+    return Work(input)();
 }
 
 void server_func(const C_std::Network::client_socket &client) {
